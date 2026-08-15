@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#02040a">
+<title>QUANTUM AI // Creator Engine</title>
+
+<style>
+:root{
+--cyan:#00f3ff;
+--purple:#9d00ff;
+--pink:#ff0055;
+--green:#00ff66;
+--red:#ff3158;
+--bg:#02040a;
+--panel:rgba(7,12,25,.82);
+--panel2:rgba(3,7,17,.95);
+--text:#f8fbff;
+--muted:#8290a8;
+--border:rgba(255,255,255,.08);
+--cyanborder:rgba(0,243,255,.28);
+--transition:220ms cubic-bezier(.2,.8,.2,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+min-height:100vh;
+color:var(--text);
+font-family:Inter,system-ui,-apple-system,sans-serif;
+background:
+radial-gradient(circle at 50% -10%,rgba(157,0,255,.2),transparent 42%),
+radial-gradient(circle at 0 50%,rgba(0,243,255,.08),transparent 35%),
+var(--bg);
+overflow-x:hidden;
+}
+
+.grid{
+position:fixed;
+inset:0;
+z-index:-3;
+opacity:.25;
+background-image:
+linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+background-size:45px 45px;
+}
+
+.app{
+width:min(1200px,calc(100% - 28px));
+margin:28px auto 70px;
+}
+
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:18px;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.brand-icon{
+width:46px;height:46px;
+display:grid;place-items:center;
+border-radius:15px;
+font-size:22px;
+background:linear-gradient(135deg,rgba(0,243,255,.18),rgba(157,0,255,.2));
+border:1px solid var(--cyanborder);
+box-shadow:0 0 30px rgba(0,243,255,.15);
+}
+
+.brand-name{font-weight:950;letter-spacing:1.4px}
+.brand-version{color:var(--muted);font-size:10px;margin-top:3px}
+
+.status{
+display:flex;
+align-items:center;
+gap:8px;
+padding:9px 13px;
+border-radius:999px;
+border:1px solid rgba(0,255,102,.18);
+background:rgba(0,255,102,.04);
+color:#a8ffc7;
+font-size:10px;
+font-weight:900;
+}
+
+.dot{
+width:7px;height:7px;
+border-radius:50%;
+background:var(--green);
+box-shadow:0 0 12px var(--green);
+}
+
+.panel{
+position:relative;
+padding:32px;
+border:1px solid var(--cyanborder);
+border-radius:30px;
+background:linear-gradient(145deg,rgba(10,17,34,.94),rgba(4,8,18,.84));
+backdrop-filter:blur(30px);
+box-shadow:0 0 45px rgba(0,243,255,.1);
+}
+
+.hero{margin-bottom:26px}
+
+.badge{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:7px 13px;
+margin-bottom:15px;
+border-radius:999px;
+border:1px solid rgba(0,243,255,.3);
+background:rgba(0,243,255,.06);
+color:var(--cyan);
+font-size:9px;
+font-weight:950;
+letter-spacing:1.7px;
+}
+
+h1{
+font-size:clamp(34px,6vw,56px);
+line-height:.98;
+font-weight:950;
+background:linear-gradient(120deg,#fff 10%,var(--cyan) 48%,var(--purple) 90%);
+-webkit-background-clip:text;
+background-clip:text;
+color:transparent;
+margin-bottom:13px;
+}
+
+.hero p{
+max-width:760px;
+color:var(--muted);
+font-size:14px;
+line-height:1.65;
+}
+
+.tools{
+display:flex;
+gap:7px;
+overflow-x:auto;
+padding:6px;
+margin-bottom:24px;
+border:1px solid var(--border);
+border-radius:18px;
+background:rgba(0,0,0,.22);
+scrollbar-width:none;
+}
+
+.tool{
+flex:0 0 auto;
+padding:11px 14px;
+border:1px solid transparent;
+border-radius:12px;
+background:transparent;
+color:var(--muted);
+font-size:11px;
+font-weight:850;
+cursor:pointer;
+transition:var(--transition);
+}
+
+.tool:hover{color:#fff;background:rgba(255,255,255,.04)}
+
+.tool.active{
+color:#fff;
+background:linear-gradient(135deg,rgba(0,243,255,.15),rgba(157,0,255,.15));
+border-color:rgba(0,243,255,.32);
+box-shadow:0 0 22px rgba(0,243,255,.08);
+}
+
+.input-label{
+display:flex;
+justify-content:space-between;
+margin:0 3px 8px;
+color:var(--muted);
+font-size:10px;
+font-weight:850;
+text-transform:uppercase;
+}
+
+.input-box{
+display:flex;
+align-items:center;
+gap:9px;
+padding:8px;
+background:var(--panel2);
+border:1px solid var(--border);
+border-radius:18px;
+transition:var(--transition);
+}
+
+.input-box:focus-within{
+border-color:var(--cyan);
+box-shadow:0 0 30px rgba(0,243,255,.12);
+}
+
+.input-icon{
+width:43px;height:43px;
+display:grid;place-items:center;
+border-radius:13px;
+background:rgba(0,243,255,.07);
+color:var(--cyan);
+}
+
+#videoUrl{
+flex:1;
+border:0;
+outline:0;
+background:transparent;
+color:#fff;
+font-size:14px;
+}
+
+.input-actions{display:flex;gap:7px}
+
+.btn{
+border:0;
+cursor:pointer;
+font-size:10px;
+font-weight:950;
+border-radius:12px;
+transition:var(--transition);
+}
+
+.paste{
+padding:13px 15px;
+color:var(--cyan);
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.08);
+}
+
+.execute{
+padding:13px 21px;
+color:#fff;
+background:linear-gradient(135deg,var(--cyan),var(--purple));
+box-shadow:0 0 25px rgba(0,243,255,.18);
+}
+
+.execute:hover{
+transform:translateY(-2px);
+filter:brightness(1.12);
+}
+
+.loader{
+display:none;
+margin-top:22px;
+padding:17px;
+border:1px solid rgba(0,243,255,.14);
+border-radius:16px;
+background:rgba(0,243,255,.025);
+}
+
+.loader.visible{display:block}
+
+.loader-status{
+color:var(--cyan);
+font-size:10px;
+font-weight:900;
+margin-bottom:10px;
+}
+
+.progress{
+height:5px;
+overflow:hidden;
+border-radius:99px;
+background:rgba(255,255,255,.06);
+}
+
+.progress-bar{
+width:30%;
+height:100%;
+background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));
+animation:progress 1.15s infinite ease-in-out;
+}
+
+@keyframes progress{
+0%{transform:translateX(-130%)}
+100%{transform:translateX(500%)}
+}
+
+.result{margin-top:23px}
+
+.empty{
+padding:42px 20px;
+text-align:center;
+border:1px dashed rgba(255,255,255,.08);
+border-radius:18px;
+color:var(--muted);
+}
+
+.result-card{
+border:1px solid var(--border);
+border-radius:23px;
+background:linear-gradient(145deg,rgba(10,17,30,.9),rgba(2,5,13,.94));
+padding:24px;
+}
+
+.result-title{
+font-size:18px;
+font-weight:900;
+margin-bottom:16px;
+color:#fff;
+}
+
+.format-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:12px;
+}
+
+.download-link{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:14px;
+color:#fff;
+text-decoration:none;
+border:1px solid rgba(255,255,255,.08);
+border-radius:13px;
+background:rgba(255,255,255,.025);
+transition:var(--transition);
+}
+
+.download-link:hover{
+border-color:var(--cyan);
+background:rgba(0,243,255,.08);
+transform:translateY(-2px);
+}
+
+.download-badge{
+padding:5px 9px;
+border-radius:7px;
+color:var(--cyan);
+background:rgba(0,243,255,.1);
+font-size:9px;
+font-weight:900;
+}
+
+.ai-box{
+padding:18px;
+border:1px solid rgba(0,243,255,.2);
+border-radius:16px;
+background:rgba(0,243,255,.03);
+color:#d7deea;
+font-size:13px;
+line-height:1.6;
+white-space:pre-wrap;
+}
+
+.toast-container{
+position:fixed;
+right:18px;
+bottom:18px;
+z-index:999;
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.toast{
+padding:12px 16px;
+border:1px solid rgba(0,243,255,.3);
+border-radius:12px;
+color:#fff;
+background:rgba(5,10,22,.95);
+font-size:11px;
+font-weight:800;
+box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.toast.error{border-color:var(--red);color:#ff9bae}
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+
+<main class="app">
+
+<header class="topbar">
+<div class="brand">
+<div class="brand-icon">⚛</div>
+<div>
+<div class="brand-name">QUANTUM AI</div>
+<div class="brand-version">CREATOR ENGINE / v20.0</div>
+</div>
+</div>
+<div class="status">
+<span class="dot"></span>
+CORE ONLINE
+</div>
+</header>
+
+<section class="panel">
+
+<div class="hero">
+<div class="badge">QUANTUM INTELLIGENCE SYSTEM</div>
+<h1 id="suiteTitle">QUANTUM AI</h1>
+<p id="suiteDesc">One media URL. Complete creator intelligence — high speed extraction, AI analysis, viral captions, and master audio processing.</p>
+</div>
+
+<nav class="tools" id="tools">
+<button class="tool active" data-mode="auto">⚡ <span>4K Extractor</span></button>
+<button class="tool" data-mode="ai_summary">🤖 <span>AI Summary</span></button>
+<button class="tool" data-mode="ai_captions">🔥 <span>Viral Engine</span></button>
+<button class="tool" data-mode="ai_prompt">🎨 <span>Thumbnail AI</span></button>
+<button class="tool" data-mode="mp3">🎵 <span>Master MP3</span></button>
+</nav>
+
+<section>
+<div class="input-label">
+<span>Media Source URL</span>
+<span>PRESS ENTER TO EXECUTE</span>
+</div>
+
+<div class="input-box">
+<div class="input-icon">🔗</div>
+<input id="videoUrl" type="url" autocomplete="off" placeholder="Paste YouTube, TikTok or Video URL..." aria-label="Media URL">
+<div class="input-actions">
+<button class="btn paste" id="pasteBtn" type="button">📋 Paste</button>
+<button class="btn execute" id="executeBtn" type="button">⚡ Execute</button>
+</div>
+</div>
+</section>
+
+<div class="loader" id="loader">
+<div class="loader-status" id="loaderText">PROCESSING QUANTUM STREAM...</div>
+<div class="progress"><div class="progress-bar"></div></div>
+</div>
+
+<div class="result" id="result">
+<div class="empty">
+<h3>Awaiting Quantum Input</h3>
+<p>Paste a media URL above and click Execute to begin.</p>
+</div>
+</div>
+
+</section>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+"use strict";
+
+// Auto-detect backend port or fallback to Localhost 8000
+const API_BASE = (window.location.protocol === 'file:' || !window.location.port) 
+                 ? 'http://127.0.0.1:8000' 
+                 : window.location.origin;
+
+const CONFIG = {
+  modes: {
+    auto: { title: "QUANTUM AI // Media Extractor", desc: "Extract available 4K, 1080p and high-speed MP4 video streams.", loader: "EXTRACTING MEDIA STREAMS..." },
+    ai_summary: { title: "QUANTUM AI // Video Summarizer", desc: "Transform long video media into structured AI key insights.", loader: "GENERATING AI SUMMARY..." },
+    ai_captions: { title: "QUANTUM AI // Viral Caption Engine", desc: "Generate high-converting hooks, viral captions, and hashtags.", loader: "PROCESSING VIRAL SIGNALS..." },
+    ai_prompt: { title: "QUANTUM AI // Thumbnail Generator", desc: "Create high-CTR visual prompts for Midjourney/DALL-E.", loader: "CRAFTING VISUAL PROMPTS..." },
+    mp3: { title: "QUANTUM AI // Master Audio Extractor", desc: "Extract HQ 320kbps MP3 audio track directly from media.", loader: "EXTRACTING HQ AUDIO..." }
+  }
+};
+
+let currentMode = "auto";
+
+const videoUrlInput = document.getElementById("videoUrl");
+const executeBtn = document.getElementById("executeBtn");
+const pasteBtn = document.getElementById("pasteBtn");
+const loader = document.getElementById("loader");
+const loaderText = document.getElementById("loaderText");
+const resultContainer = document.getElementById("result");
+const suiteTitle = document.getElementById("suiteTitle");
+const suiteDesc = document.getElementById("suiteDesc");
+const toolsNav = document.getElementById("tools");
+
+toolsNav.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tool");
+  if (!btn) return;
+  document.querySelectorAll(".tool").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  currentMode = btn.dataset.mode;
+  const info = CONFIG.modes[currentMode] || CONFIG.modes.auto;
+  suiteTitle.textContent = info.title;
+  suiteDesc.textContent = info.desc;
+});
+
+pasteBtn.addEventListener("click", async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) {
+      videoUrlInput.value = text;
+      showToast("Link pasted from clipboard!", "success");
+    }
+  } catch (err) {
+    showToast("Clipboard access denied", "error");
+  }
+});
+
+videoUrlInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    processQuantumRequest();
+  }
+});
+
+executeBtn.addEventListener("click", processQuantumRequest);
+
+async function processQuantumRequest() {
+  const url = videoUrlInput.value.trim();
+  if (!url) {
+    showToast("Please enter a valid URL!", "error");
+    return;
+  }
+
+  const modeInfo = CONFIG.modes[currentMode] || CONFIG.modes.auto;
+  loaderText.textContent = modeInfo.loader;
+  loader.classList.add("visible");
+  executeBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${API_BASE}/extract`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url, tool_type: currentMode })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to process request");
+    }
+
+    renderResult(data.data);
+    showToast("Quantum Processing Complete!", "success");
+  } catch (err) {
+    resultContainer.innerHTML = `
+      <div class="result-card" style="border-color:var(--red);">
+        <h3 class="result-title" style="color:var(--red);">Processing Error</h3>
+        <p style="color:var(--muted); font-size:13px;">${err.message}</p>
+      </div>
+    `;
+    showToast(err.message, "error");
+  } finally {
+    loader.classList.remove("visible");
+    executeBtn.disabled = false;
+  }
+}
+
+function renderResult(data) {
+  if (!data) return;
+
+  let contentHtml = "";
+
+  if (data.type === "downloader" && data.formats) {
+    contentHtml = `
+      <div class="result-card">
+        <h3 class="result-title">🎬 ${data.title || "Media Stream"}</h3>
+        <div class="format-grid">
+          ${data.formats.map(f => {
+            const downloadUrl = f.url.startsWith('/') ? `${API_BASE}${f.url}` : f.url;
+            return `
+              <a href="${downloadUrl}" class="download-link" target="_blank" download>
+                <div><div style="font-weight:900; font-size:12px;">${f.label}</div></div>
+                <span class="download-badge">${f.badge}</span>
+              </a>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else if (data.data) {
+    contentHtml = `
+      <div class="result-card">
+        <h3 class="result-title">🧠 ${data.title}</h3>
+        <div class="ai-box">${Array.isArray(data.data) ? data.data.join('\n\n') : data.data}</div>
+      </div>
+    `;
+  } else if (data.caption) {
+    contentHtml = `
+      <div class="result-card">
+        <h3 class="result-title">🔥 Viral Caption & Hashtags</h3>
+        <div class="ai-box">${data.caption}</div>
+      </div>
+    `;
+  } else if (data.prompt) {
+    contentHtml = `
+      <div class="result-card">
+        <h3 class="result-title">🎨 AI Thumbnail Prompt</h3>
+        <div class="ai-box">${data.prompt}</div>
+      </div>
+    `;
+  }
+
+  resultContainer.innerHTML = contentHtml;
+}
+
+function showToast(msg, type = "info") {
+  const toastContainer = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  toastContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+</script>
+
+</body>
+</html>
